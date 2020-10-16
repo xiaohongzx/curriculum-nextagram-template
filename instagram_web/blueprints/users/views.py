@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, flash, redirect, url_for, request
+from models.user import User
 
 
 users_blueprint = Blueprint('users',
@@ -34,3 +35,20 @@ def edit(id):
 @users_blueprint.route('/<id>', methods=['POST'])
 def update(id):
     pass
+
+
+# create new user with data from form
+@users_blueprint.route("/user/", methods=['POST'])
+def user_create():
+    # get form value in form
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    create_new_user = User(username = username, email = email, password = password)
+
+    if create_new_user.save():
+        flash("account created")
+    else:
+        flash("username duplicated, please choose another username")
+    return redirect(url_for("users.new"))
+    
