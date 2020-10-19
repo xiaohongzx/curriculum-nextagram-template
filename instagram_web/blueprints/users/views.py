@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.user import User
-from werkzeug.security import generate_password_hash
+
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -12,9 +12,21 @@ def new():
     return render_template('users/new.html')
 
 
-@users_blueprint.route('/', methods=['POST'])
-def create():
-    pass
+# create new user with data from form
+@users_blueprint.route("/", methods=['POST'])
+def user_create():
+    # get form value in form
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    create_new_user = User(username = username, email = email, password = password)
+
+    if create_new_user.save():
+        return redirect("/")
+    else:
+        return redirect(url_for("users.new"))
+
+
 
 
 @users_blueprint.route('/<username>', methods=["GET"])
@@ -37,19 +49,5 @@ def update(id):
     pass
 
 
-# create new user with data from form
-@users_blueprint.route("/user/", methods=['POST'])
-def user_create():
-    # get form value in form
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    hashed_password = generate_password_hash(password)
-    create_new_user = User(username = username, email = email, password = hashed_password)
 
-    if create_new_user.save():
-        flash("account created")
-    else:
-        flash("username duplicated, please choose another username")
-    return redirect(url_for("users.new"))
     
