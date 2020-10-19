@@ -14,7 +14,7 @@ def new():
 
 # create new user with data from form
 @users_blueprint.route("/", methods=['POST'])
-def user_create():
+def create():
     # get form value in form
     username = request.form.get('username')
     email = request.form.get('email')
@@ -25,9 +25,6 @@ def user_create():
         return redirect("/")
     else:
         return redirect(url_for("users.new"))
-
-
-
 
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
