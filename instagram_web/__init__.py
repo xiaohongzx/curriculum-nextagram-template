@@ -25,5 +25,5 @@ def page_not_found(e):
 
 @app.route("/")
 def home():
-    user = User.get_or_none(id=session['user_id'])
-    return render_template('home.html', user = user)
+    #user = User.get_or_none(id=session['user_id'])
+    return render_template('home.html')

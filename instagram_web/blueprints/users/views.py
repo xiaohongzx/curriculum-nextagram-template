@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.user import User
-
+from flask_login import login_required, current_user
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -27,9 +27,13 @@ def create():
         return redirect(url_for("users.new"))
 
 @users_blueprint.route('/<username>', methods=["GET"])
+#@login_required
 def show(username):
-    return username
-
+    if current_user.is_authenticated:
+        print("hey")
+        return username
+    else:
+        return "Please login to continue"
 
 @users_blueprint.route('/', methods=["GET"])
 def index():
