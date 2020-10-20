@@ -3,6 +3,8 @@ from models.user import User
 from flask_login import login_required, current_user, login_user
 from helpers import upload_file_to_s3
 from config import S3_BUCKET
+from werkzeug.security import check_password_hash
+
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -29,13 +31,9 @@ def create():
         return redirect(url_for("users.new"))
 
 @users_blueprint.route('/<username>', methods=["GET"])
-@login_required
 def show(username):
-    if current_user.is_authenticated:
-        print("hey")
-        return username
-    else:
-        return "Please login to continue"
+    user = User.get_or_none(User.username == username)
+    return render_template("users/show.html", user = user)
 
 @users_blueprint.route('/', methods=["GET"])
 def index():
@@ -45,26 +43,56 @@ def index():
 @users_blueprint.route('/<id>/edit', methods=['GET'])
 @login_required
 def edit(id):
-    user = User.get_by_id(id)
-    if current_user ==  user:
-        return render_template('users/user_profile.html')
+    #user = User.get_by_id(id)
+    user = User.get_or_none(User.id == id)
+    if user:
+        if current_user.id ==  user.id:
+            return render_template('users/edit.html', id = id, user = user)
+        else:
+            return "Unauthorized to view others profile page"
     else:
-        return "Unauthorized to view others profile page"
+        return "No such user found !"
 
 
 @users_blueprint.route('/<id>', methods=['POST'])
 @login_required
 def update(id):
 
-    user = User.get_by_id(id)
-    data = request.form
-    update_user = User.update(username = data.get('username'),email = data.get('email')).where(User.id == id)
-    if update_user.execute():
-        flash("changed")
-        return redirect(url_for('users.edit', id=current_user.id))
+    # user = User.get_by_id(id)
+    # data = request.form
+    # update_user = User.update(username = data.get('username'),email = data.get('email')).where(User.id == id)
+    # if update_user.execute():
+    #     flash("changed")
+    #     return redirect(url_for('users.edit', id=current_user.id))
+    # else:
+    #     flash("something wrong")
+    #     return redirect(url_for('users.edit', id=current_user.id))
+
+    user = User.get_or_none(User.id == id)
+    if user:
+        if current_user.id ==  user.id:
+            data = request.form
+            hashed_password = user.password_hash
+            result = check_password_hash(hashed_password, data.get('old_password'))
+            if result:
+                user.username = data.get("username")
+                user.email = data.get("email")
+
+                if data.get("password") != "":
+                    user.password = data.get("password")
+
+                if user.save():
+                    return redirect(url_for("users.show", id = id, username = user.username))
+                else:
+                    return redirect(url_for("users.edit", id = id))
+
+            else:
+                flash("Wrong comfirmation password")
+                return redirect(url_for("users.edit",id = id))
+        else:
+            return "Unauthorized to view others profile page"
     else:
-        flash("something wrong")
-        return redirect(url_for('users.edit', id=current_user.id))
+        return "No such user found !"
 
 
 @users_blueprint.route('/profile_image')

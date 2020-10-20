@@ -8,6 +8,7 @@ class User(BaseModel, UserMixin):
     username = pw.CharField(unique=True)  
     email = pw.CharField(unique=True) 
     password_hash = pw.CharField(unique=False)
+    image_path = pw.CharField(null=True)
     password = None
 
     def validate(self):
@@ -15,10 +16,10 @@ class User(BaseModel, UserMixin):
         duplicate_username = User.get_or_none(User.username == self.username)
         duplicate_email = User.get_or_none(User.email == self.email)
         print("User validation in process")
-        if duplicate_username:
+        if duplicate_username and self.id != duplicate_username.id: 
             self.errors.append('Username not unique')
 
-        if duplicate_email:
+        if duplicate_email and self.id != duplicate_email.id:
             self.errors.append('Email not unique')    
             
 
@@ -42,6 +43,4 @@ class User(BaseModel, UserMixin):
         if not self.password_hash:
             self.errors.append("Password must be present")
 
-    @hybrid_property
-    def profile_image_url(self):
-        return AWS_S3_DOMAIN + self.image_path            
+          
