@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.user import User
 from flask_login import login_required, current_user, login_user
+from helpers import upload_file_to_s3
+from config import S3_BUCKET
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -65,5 +67,20 @@ def update(id):
         return redirect(url_for('users.edit', id=current_user.id))
 
 
+@users_blueprint.route('/profile_image')
+def profile_image():
+    return render_template('users/profile_pic.html')
 
-    
+
+@users_blueprint.route('/profile_image/upload', methods=["POST"])
+def upload_file():
+    file = request.files["user_file"]  
+
+    if file.filename == "":
+        return "Please select an image"
+
+    if file:
+        output = upload_file_to_s3(file, S3_BUCKET)
+        return str(output)
+    else:
+        return redirect(url_for('users.profile_image'))

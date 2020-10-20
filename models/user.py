@@ -41,4 +41,7 @@ class User(BaseModel, UserMixin):
         
         if not self.password_hash:
             self.errors.append("Password must be present")
-                
+
+    @hybrid_property
+    def profile_image_url(self):
+        return AWS_S3_DOMAIN + self.image_path            
