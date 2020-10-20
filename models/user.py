@@ -3,6 +3,8 @@ import peewee as pw
 from werkzeug.security import generate_password_hash
 import re
 from flask_login import UserMixin
+from playhouse.hybrid import hybrid_property
+
 
 class User(BaseModel, UserMixin):
     username = pw.CharField(unique=True)  
@@ -10,6 +12,11 @@ class User(BaseModel, UserMixin):
     password_hash = pw.CharField(unique=False)
     image_path = pw.CharField(null=True)
     password = None
+
+    @hybrid_property
+    def profile_image_path(self):
+        from app import app
+        return app.config.get("AWS_S3_DOMAIN")+ self.image_path
 
     def validate(self):
 

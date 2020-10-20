@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.user import User
 from flask_login import login_required, current_user, login_user
-from helpers import upload_file_to_s3
-from config import S3_BUCKET
 from werkzeug.security import check_password_hash
+from helpers import upload_to_s3
 
 
 users_blueprint = Blueprint('users',
@@ -95,20 +94,51 @@ def update(id):
         return "No such user found !"
 
 
-@users_blueprint.route('/profile_image')
-def profile_image():
-    return render_template('users/profile_pic.html')
+@users_blueprint.route('/<id>/upload_profile', methods=['POST'])
+@login_required
+def upload_profile(id):
+    user = User.get_or_none(User.id == id)
+    if user:
+        if "profile_image" not in request.files:
+            return "No user_file key in request.files"
 
+        file = request.files["profile_image"]
 
-@users_blueprint.route('/profile_image/upload', methods=["POST"])
-def upload_file():
-    file = request.files["user_file"]  
-
-    if file.filename == "":
-        return "Please select an image"
-
-    if file:
-        output = upload_file_to_s3(file, S3_BUCKET)
-        return str(output)
+        if file.filename == "":
+            return "Please select a file"
+        
+        if file:
+            file_path = upload_to_s3(file)
+            user.image_path = file_path
+            if user.save():
+                return redirect(url_for('users.show', username = user.username))
+            else:
+                return "Could not upload profile image, please go back and try again"
+        
+        else:
+            return redirect(url_for('users.edit', id=id))
     else:
-        return redirect(url_for('users.profile_image'))
+        return "No such User"
+
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# def allowed_file(filename):
+#     return '.' in filename and \
+#             filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
+
+# @users_blueprint.route('/profile_image')
+# def profile_image():
+#     return render_template('users/profile_pic.html')
+
+
+# @users_blueprint.route('/profile_image/upload', methods=["POST"])
+# def upload_file():
+#     file = request.files["user_file"]  
+
+#     if file.filename == "":
+#         return "Please select an image"
+
+#     if file:
+#         output = upload_file_to_s3(file, S3_BUCKET)
+#         return str(output)
+#     else:
+#         return redirect(url_for('users.profile_image'))
