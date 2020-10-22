@@ -3,7 +3,7 @@ from models.user import User
 from models.image import Image
 from flask_login import login_required, current_user, login_user
 from werkzeug.security import check_password_hash
-from helpers import upload_to_s3
+from helpers import upload_to_s3, gateway
 
 
 users_blueprint = Blueprint('users',
@@ -144,3 +144,5 @@ def upload_profile(id):
 #         return str(output)
 #     else:
 #         return redirect(url_for('users.profile_image'))
+
+
