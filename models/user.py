@@ -16,6 +16,8 @@ class User(BaseModel, UserMixin):
     @hybrid_property
     def profile_image_path(self):
         from app import app
+        if not self.image_path:
+            return app.config.get("AWS_S3_DOMAIN") + "f1.jpeg"
         return app.config.get("AWS_S3_DOMAIN")+ self.image_path
 
     def validate(self):

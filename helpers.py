@@ -15,6 +15,7 @@ def upload_to_s3(file, acl="public-read"):
             file,
             app.config.get("S3_BUCKET"),
             file.filename,
+            # f"{folder_name}/{file.filename}",
             ExtraArgs={
                 "ACL": acl,
                 "ContentType": file.content_type
@@ -26,4 +27,4 @@ def upload_to_s3(file, acl="public-read"):
         print("Something Happened: ", e)
         return e
 
-    return file.filename
+    return file.filename # f"{folder_name}/{file.filename}",
