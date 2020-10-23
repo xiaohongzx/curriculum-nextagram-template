@@ -15,6 +15,8 @@ class Config(object):
     BRAIN_MERCHANT_ID                 = os.environ.get("BT_MERCHANT_ID")
     BRAIN_PUBLIC_KEY                 = os.environ.get("BT_PUBLIC_KEY")
     BRAIN_PRIVATE_KEY                 = os.environ.get("BT_PRIVATE_KEY")
+    GOOGLE_CLIENT_ID                 = os.environ.get("G_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET                 = os.environ.get("G_CLIENT_SECRET")
 
 
 class ProductionConfig(Config):

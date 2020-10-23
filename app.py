@@ -6,11 +6,13 @@ from models.base_model import db
 from flask_login import LoginManager
 from models.user import User
 
+
 web_dir = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'instagram_web')
 
 app = Flask('NEXTAGRAM', root_path=web_dir)
 csrf = CSRFProtect(app)
+
 
 
 login_manager = LoginManager()
@@ -23,6 +25,8 @@ if os.getenv('FLASK_ENV') == 'production':
     app.config.from_object("config.ProductionConfig")
 else:
     app.config.from_object("config.DevelopmentConfig")
+
+
 
 
 @login_manager.user_loader
