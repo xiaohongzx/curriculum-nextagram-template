@@ -146,3 +146,37 @@ def upload_profile(id):
 #         return redirect(url_for('users.profile_image'))
 
 
+@users_blueprint.route('/<idol_id>/follow', methods=['POST'])
+@login_required
+def follow(idol_id):
+    idol = User.get_by_id(idol_id)
+    if current_user.follow(idol):
+        return redirect(url_for('users.show', username = idol.username))
+    else:
+        return redirect(url_for('users.show', username = current_user.username))  
+
+
+@users_blueprint.route('/<idol_id>/unfollow', methods=['POST'])
+@login_required
+def unfollow(idol_id):
+    idol = User.get_by_id(idol_id)
+    if current_user.unfollow(idol):
+        return redirect(url_for('users.show', username = idol.username))
+    else:
+        return redirect(url_for('users.show', username = current_user.username))       
+
+
+@users_blueprint.route('/follow/requests', methods=['GET'])
+@login_required
+def requests():
+    return render_template('users/request.html')
+
+
+@users_blueprint.route('/<fan_id>/approve', methods=['POST'])
+@login_required
+def approve(fan_id):
+    fan = User.get_by_id(fan_id)
+    if current_user.approve(fan):
+        return redirect(url_for('users.requests'))
+    else:
+        return redirect(url_for('users.requests'))   
