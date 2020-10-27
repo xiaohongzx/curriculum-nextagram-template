@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-  
+<div class="main-container">
   <h1>Homepage</h1>
   <h1>Image Feeds</h1>
   {% for image in current_user.image_feed %}
@@ -18,9 +18,6 @@
 
   {% if current_user.is_authenticated %}
   <h3>Current User: {{current_user.username}}</h3>
-  <form action="{{url_for('sessions.destroy')}}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type='submit' value="signout">
-  </form>
   {% endif %}
+</div>
 {% endblock %}

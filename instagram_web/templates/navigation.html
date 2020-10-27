@@ -1,0 +1,25 @@
+<div class="navigation-bar">
+    <div class="logo"><a href="/"><img src="/static/images/favicon.png"><p>Nextagram</p></a> </div>
+
+    {% if current_user.is_authenticated %}
+    <ul>
+        <li><input type="text" class="input-field" placeholder="Search user"><input type="submit" value="SEARCH" class="sub"></li>
+        <li>
+            <form action="{{url_for('sessions.destroy')}}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type='submit' value="signout" class="logout">
+            </form>    
+        </li>
+        <li><a href="{{url_for('users.show', username = current_user.username)}}">{{current_user.username}}</a></li>
+    </ul>
+
+    {% else %}
+    <ul>
+        <li><input type="text" class="input-field" placeholder="Search user"><input type="submit" value="SEARCH" class="sub"></li>
+        <li><a href="{{url_for('sessions.new')}}">Log In</a></li>
+        <li><a href="{{url_for('users.new')}}">Sign Up</a></li>
+    </ul>
+
+    {% endif %}
+
+</div>

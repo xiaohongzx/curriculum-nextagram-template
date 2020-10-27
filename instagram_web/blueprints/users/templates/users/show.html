@@ -1,53 +1,69 @@
 {% extends "_layout.html" %}
 
 {% block content %}
-<h1>User Profile: {{user.id}}</h1>
-<img src="{{user.profile_image_path}}" width="200px">
+<div class="main-container">
+    <div class="userprofile">
+        <div class="userprofile-img">
+            <img src="{{user.profile_image_path}}" width="200px">
+        </div>
 
-<h4>Username: {{user.username}}</h4>
-<h4>Email: {{user.email}}</h4>
+        <div class="userprofile-info">
+            <p class="userprofile-name">{{user.username}}</p>
+            <p>User Profile: {{user.id}}</p>
+            <p>Email: {{user.email}}</p>
+
+            {% if user.id != current_user.id %}
+
+            {% if current_user.follow_status(user) %}
+            <form action="{{url_for('users.unfollow', idol_id = user.id)}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="submit" value="unfollow" class="followbutton">
+            </form>
+    
+            {% else %}
+            <form action="{{url_for('users.follow', idol_id = user.id)}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="submit" value="follow" class="followbutton">
+            </form>
+            {% endif %}
+
+            {% endif %}
+        </div>
+    </div>
 <br>
 
 
-{% if current_user.follow_status(user) %}
-<form action="{{url_for('users.unfollow', idol_id = user.id)}}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="submit" value="unfollow">
-</form>
 
-{% else %}
-<form action="{{url_for('users.follow', idol_id = user.id)}}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="submit" value="follow">
-</form>
-{% endif %}
 
 
 <br>
 
 {% if current_user.id == user.id or not user.is_private %}
-    {% for image in images %}
-        <div>
-            <img src="{{image.full_image_url}}" width="200px">
-            <p>Total Donated Amount: {{image.donations_sum}}</p>
-            <ul>
-                {% for d in image.donations %}
-                    <li>{{d.user.username}} : {{d.amount}}</li>
-                {% endfor %}
-            </ul>
+    
+    <div class="userprofile-imagefeed">
+        <ul>
+            {% for image in images %}
+            <li>
+                <img src="{{image.full_image_url}}" width="200px">
+                <!-- <p>Total Donated Amount: {{image.donations_sum}}</p>
+                <ul>
+                    {% for d in image.donations %}
+                        <li>{{d.user.username}} : {{d.amount}}</li>
+                    {% endfor %}
+                </ul>
 
-            <a href="{{url_for('transactions.new', image_id=image.id)}}">Donate</a>
-        </div>
-    {% endfor %}
+                <a href="{{url_for('transactions.new', image_id=image.id)}}">Donate</a> -->
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+   
 
 
 {% else %}
     <p>This profile is private. Follow {{user.username}} to continue</p>
 {% endif %}
 
-<!-- <form action="{{url_for('sessions.destroy')}}" method="post">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<input type='submit' value="signout">
-</form> -->
 
+</div>
 {% endblock %}
