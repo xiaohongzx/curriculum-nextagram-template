@@ -5,7 +5,7 @@ from flask import Flask
 from models.base_model import db
 from flask_login import LoginManager
 from models.user import User
-
+from flask_jwt_extended import JWTManager
 
 web_dir = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'instagram_web')
@@ -13,7 +13,7 @@ web_dir = os.path.join(os.path.dirname(
 app = Flask('NEXTAGRAM', root_path=web_dir)
 csrf = CSRFProtect(app)
 
-
+JWTManager(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
